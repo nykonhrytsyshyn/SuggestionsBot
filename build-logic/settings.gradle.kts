@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 dependencyResolutionManagement {
     versionCatalogs {
         register("libs") {
