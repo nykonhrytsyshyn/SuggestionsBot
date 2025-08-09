@@ -11,8 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 class MainTests {
 
-	@Test
-	void contextLoads() {
-	}
-
+    @Test
+    void contextLoads() {
+    }
 }
