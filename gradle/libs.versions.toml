@@ -1,0 +1,32 @@
+[versions]
+
+# libraries
+
+telegrambots   = "9.0.0"
+
+# plugins
+
+shadow                       = "8.3.3"
+spring-boot                  = "3.5.4"
+spring-dependency-management = "1.1.7"
+
+[libraries]
+
+# libraries
+
+junit-platform-launcher         = { group = "org.junit.platform",       name = "junit-platform-launcher" }
+postgresql                      = { group = "org.postgresql",           name = "postgresql" }
+spring-data-jpa                 = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
+spring-data-mongodb             = { group = "org.springframework.boot", name = "spring-boot-starter-data-mongodb" }
+spring-web                      = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+spring-devtools                 = { group = "org.springframework.boot", name = "spring-boot-devtools" }
+spring-configuration-processor  = { group = "org.springframework.boot", name = "spring-boot-configuration-processor" }
+spring-test                     = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+telegram-client                 = { group = "org.telegram",             name = "telegrambots-client",                         version.ref = "telegrambots" }
+telegram-spring-longpolling     = { group = "org.telegram",             name = "telegrambots-springboot-longpolling-starter", version.ref = "telegrambots" }
+
+# plugins
+
+plugin-shadow = { group = "com.gradleup.shadow",             name = "shadow-gradle-plugin",                          version.ref = "shadow" }
+plugin-spring-boot                  = { group = "org.springframework.boot",        name = "spring-boot",                                   version.ref = "spring-boot" }
+plugin-spring-dependency-management = { group = "io.spring.dependency-management", name = "io.spring.dependency-management.gradle.plugin", version.ref = "spring-dependency-management" }
