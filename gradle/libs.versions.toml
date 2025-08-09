@@ -2,7 +2,7 @@
 
 # libraries
 
-telegrambots   = "9.0.0"
+telegrambots = "9.0.0"
 
 # plugins
 
@@ -27,6 +27,6 @@ telegram-spring-longpolling     = { group = "org.telegram",             name = "
 
 # plugins
 
-plugin-shadow = { group = "com.gradleup.shadow",             name = "shadow-gradle-plugin",                          version.ref = "shadow" }
-plugin-spring-boot                  = { group = "org.springframework.boot",        name = "spring-boot",                                   version.ref = "spring-boot" }
+plugin-shadow                       = { group = "com.gradleup.shadow",             name = "shadow-gradle-plugin",                          version.ref = "shadow" }
+plugin-spring-boot                  = { group = "org.springframework.boot",        name = "spring-boot-gradle-plugin",                     version.ref = "spring-boot" }
 plugin-spring-dependency-management = { group = "io.spring.dependency-management", name = "io.spring.dependency-management.gradle.plugin", version.ref = "spring-dependency-management" }

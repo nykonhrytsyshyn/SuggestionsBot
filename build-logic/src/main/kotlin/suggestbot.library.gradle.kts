@@ -1,7 +1,8 @@
 import org.gradle.kotlin.dsl.invoke
 
 plugins {
-    id("suggestbot.shadow")
+    id("suggestbot.base")
+    id("com.gradleup.shadow")
 }
 
 dependencies {
@@ -19,5 +20,9 @@ tasks {
 
     shadowJar {
         destinationDirectory.set(file("$rootDir/build/lib"))
+    }
+
+    build {
+        dependsOn(shadowJar)
     }
 }

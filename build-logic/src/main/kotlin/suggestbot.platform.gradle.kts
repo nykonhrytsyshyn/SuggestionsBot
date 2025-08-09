@@ -1,9 +1,7 @@
-import gradle.kotlin.dsl.accessors._0cb39c16b209519d61ee18b0fceac003.test
-import gradle.kotlin.dsl.accessors._0cb39c16b209519d61ee18b0fceac003.testRuntimeOnly
-import org.gradle.kotlin.dsl.invoke
-
 plugins {
-    id("suggestbot.shadow")
+    id("suggestbot.base")
+    id("org.springframework.boot")
+    id("io.spring.dependency-management")
 }
 
 dependencies {
@@ -21,10 +19,9 @@ tasks {
         enabled = false
     }
 
-    shadowJar {
+    bootJar {
+        archiveFileName.set("${project.name}-${version}.jar")
         destinationDirectory.set(file("$rootDir/build/platform"))
-
-        archiveClassifier.set("")
     }
 
     test {
