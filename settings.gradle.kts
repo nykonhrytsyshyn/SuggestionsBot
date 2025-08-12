@@ -13,11 +13,7 @@ includeLib("common")
 includeService("bot")
 includeService("worker")
 
-/*
-* Functions for including libraries and services.
-* These functions cannot be moved to build-logic because they rely on
-* the `Settings` object, which is not available in build-logic.
-*/
+/* Functions for including libraries and services */
 //<editor-fold desc="Functions" defaultstate="collapsed">
 
 /**
