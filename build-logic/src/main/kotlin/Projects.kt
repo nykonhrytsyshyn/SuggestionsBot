@@ -7,8 +7,8 @@ import org.gradle.api.Project
 const val LIB_PREFIX = "SuggestLib"
 const val LIB_DIR    = "lib"
 
-const val PLATFORM_PREFIX = "SuggestPlatform"
-const val PLATFORM_DIR    = "platform"
+const val SERVICE_PREFIX = "SuggestService"
+const val SERVICE_DIR    = "service"
 
 //</editor-fold>
 
@@ -23,7 +23,7 @@ const val PLATFORM_DIR    = "platform"
  * @property baseDir The base directory where the project is located.
  *
  * @see [ProjectType.LIB]
- * @see [ProjectType.PLATFORM]
+ * @see [ProjectType.SERVICE]
  */
 enum class ProjectType(
     val prefix: String,
@@ -35,18 +35,18 @@ enum class ProjectType(
      * Represents a library subproject.
      *
      * Properties:
-     * - **prefix** — [LIB_PREFIX]
+     * - **prefix**  — [LIB_PREFIX]
      * - **baseDir** — [LIB_DIR]
      */
     LIB(LIB_PREFIX, LIB_DIR),
     /**
-     * Represents a platform subproject.
+     * Represents a service subproject.
      *
      * Properties:
-     * - **prefix** — [PLATFORM_PREFIX]
-     * - **baseDir** — [PLATFORM_DIR]
+     * - **prefix**  — [SERVICE_PREFIX]
+     * - **baseDir** — [SERVICE_DIR]
      */
-    PLATFORM(PLATFORM_PREFIX, PLATFORM_DIR)
+    SERVICE(SERVICE_PREFIX, SERVICE_DIR)
 
     //</editor-fold>
 }
@@ -100,7 +100,7 @@ interface SubProject {
  * - **path** — Gradle path to the project.
  * - **directory** — location relative to the root.
  *
- * @param type The type of the project (LIB or PLATFORM).
+ * @param type The type of the project (LIB or SERVICE).
  * @param name Short project name (without prefixes or directories).
  *
  * @see ProjectType
@@ -121,11 +121,11 @@ sealed class SubProjects(
     //<editor-fold desc="Subprojects" defaultstate="collapsed">
 
     /** Common library module with shared components. */
-    object Common : SubProjects(ProjectType.LIB,      "common")
-    /** Platform module for the Telegram bot. */
-    object Bot    : SubProjects(ProjectType.PLATFORM, "bot")
-    /** Platform module for database-related logic. */
-    object DB     : SubProjects(ProjectType.PLATFORM, "db")
+    object Common : SubProjects(ProjectType.LIB,     "common")
+    /** Main bot service module. */
+    object Bot    : SubProjects(ProjectType.SERVICE, "bot")
+    /** Worker service module for background tasks. */
+    object Worker : SubProjects(ProjectType.SERVICE, "worker")
 
     //</editor-fold>
 
@@ -140,8 +140,8 @@ sealed class SubProjects(
             listOf(
                 /* Libraries */
                 Common,
-                /* Platforms */
-                Bot, DB
+                /* Services */
+                Bot, Worker
             ).find { it.projectName == name }
     }
 }
