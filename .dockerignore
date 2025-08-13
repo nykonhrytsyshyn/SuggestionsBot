@@ -1,0 +1,24 @@
+# Gradle cache
+.gradle
+**/build
+!**/build.gradle
+!**/build.gradle.kts
+
+# IntelliJ IDEA / JetBrains IDE
+*.iml
+.idea
+
+# Logs
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose.yml
+scripts/docker-compose.dev.yml
+README.md
+LICENSE
+
+# Trash files
+.DS_Store
+Thumbs.db

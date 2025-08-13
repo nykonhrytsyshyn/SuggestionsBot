@@ -35,6 +35,9 @@ api/bin/
 /nbdist/
 /.nb-gradle/
 
+# Environment files
+.env
+
 # Compiled class file
 *.class
 
