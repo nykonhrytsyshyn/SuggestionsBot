@@ -29,6 +29,11 @@ dependencies {
     if (project.name != SubProjects.Common.projectName) {
         compileOnlyApi(SubProjects.Common.asProject(rootProject))
     }
+
+    implementation(libs.fastutil)
+    implementation(libs.google.guava)
+    implementation(libs.google.jsr305)
+    implementation(libs.jetbrains.annotations)
 }
 
 sourceSets {

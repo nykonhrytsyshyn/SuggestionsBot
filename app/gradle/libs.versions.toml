@@ -2,7 +2,13 @@
 
 # libraries
 
-telegrambots = "9.0.0"
+telegrambots          = "9.0.0"
+fastutil              = "8.5.16"
+google-guava          = "33.4.8-jre"
+google-jsr305         = "3.0.2"
+jetbrains-annotations = "26.0.2"
+junit-jupiter         = "5.13.4"
+yaml-snakeyaml        = "2.4"
 
 # plugins
 
@@ -14,6 +20,11 @@ spring-dependency-management = "1.1.7"
 
 # libraries
 
+fastutil                        = { group = "it.unimi.dsi",             name = "fastutil",                                    version.ref = "fastutil" }
+google-guava                    = { group = "com.google.guava",         name = "guava",                                       version.ref = "google-guava" }
+google-jsr305                   = { group = "com.google.code.findbugs", name = "jsr305",                                      version.ref = "google-jsr305" }
+jetbrains-annotations           = { group = "org.jetbrains",            name = "annotations",                                 version.ref = "jetbrains-annotations" }
+junit-jupiter                   = { group = "org.junit.jupiter",        name = "junit-jupiter",                               version.ref = "junit-jupiter" }
 junit-platform-launcher         = { group = "org.junit.platform",       name = "junit-platform-launcher" }
 postgresql                      = { group = "org.postgresql",           name = "postgresql" }
 spring-data-jpa                 = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
@@ -24,6 +35,7 @@ spring-configuration-processor  = { group = "org.springframework.boot", name = "
 spring-test                     = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
 telegram-client                 = { group = "org.telegram",             name = "telegrambots-client",                         version.ref = "telegrambots" }
 telegram-spring-longpolling     = { group = "org.telegram",             name = "telegrambots-springboot-longpolling-starter", version.ref = "telegrambots" }
+yaml-snakeyaml                  = { group = "org.yaml",                 name = "snakeyaml",                                   version.ref = "yaml-snakeyaml" }
 
 # plugins
 
