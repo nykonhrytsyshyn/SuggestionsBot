@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: SuggestionsBot
+
+logging:
+  level:
+    root: info

@@ -1,0 +1,18 @@
+services:
+  builder:
+    env_file: ".env"
+    build:
+      context: ..
+      dockerfile: docker/builder/dev.Dockerfile
+    volumes:
+      - build-artifacts:/output
+
+  bot:
+    depends_on:
+      builder:
+        condition: service_completed_successfully
+
+  worker:
+    depends_on:
+      builder:
+        condition: service_completed_successfully
