@@ -1,11 +1,16 @@
+# This file overrides the "docker-compose.dev.yml" file.
+# It is used to build the application artifacts in a separate builder service.
+
 services:
   builder:
+    container_name: service_builder
     env_file: ".env"
     build:
       context: ..
       dockerfile: docker/builder/dev.Dockerfile
     volumes:
       - build-artifacts:/output
+      - gradle-cache:/home/gradle/.gradle
 
   bot:
     depends_on:

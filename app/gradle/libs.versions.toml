@@ -27,6 +27,7 @@ jetbrains-annotations           = { group = "org.jetbrains",            name = "
 junit-jupiter                   = { group = "org.junit.jupiter",        name = "junit-jupiter",                               version.ref = "junit-jupiter" }
 junit-platform-launcher         = { group = "org.junit.platform",       name = "junit-platform-launcher" }
 postgresql                      = { group = "org.postgresql",           name = "postgresql" }
+spring-actuator                 = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 spring-data-jpa                 = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa" }
 spring-data-redis               = { group = "org.springframework.boot", name = "spring-boot-starter-data-redis" }
 spring-web                      = { group = "org.springframework.boot", name = "spring-boot-starter-web" }

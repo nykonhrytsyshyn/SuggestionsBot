@@ -1,20 +1,34 @@
+version: "3.9"
+name: suggestionsbot-dev
+
 services:
   bot:
+    container_name: service_bot
     env_file: ".env"
     build:
       context: ..
       dockerfile: docker/service-bot/dev.Dockerfile
     depends_on:
       worker:
-        condition: service_started
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     volumes:
       - build-artifacts:/app
     ports:
-      - "${BOT_PORT}:8080"
+      - "${BOT_PORT}:${BOT_PORT}"
+    networks:
+      - suggestionsbot-net
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${BOT_PORT}/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   worker:
+    container_name: service_worker
     env_file: ".env"
     build:
       context: ..
@@ -26,26 +40,33 @@ services:
         condition: service_healthy
     environment:
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_REDIS_HOST: redis
-      SPRING_REDIS_PORT: ${REDIS_PORT}
     volumes:
       - build-artifacts:/app
     ports:
-      - "${WORKER_PORT}:8081"
+      - "${WORKER_PORT}:${WORKER_PORT}"
+    networks:
+      - suggestionsbot-net
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${WORKER_PORT}/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   postgres:
+    container_name: db_postgres
     image: postgres:16-alpine
-    container_name: suggestservice_postgres
+    env_file: ".env"
     restart: always
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    networks:
+      - suggestionsbot-net
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
@@ -53,11 +74,17 @@ services:
       retries: 5
 
   redis:
+    container_name: db_redis
     image: redis:7-alpine
-    container_name: suggestservice_redis
+    env_file: ".env"
     restart: always
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    volumes:
+      - redis-data:/data
     ports:
-      - "${REDIS_PORT}:6379"
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - suggestionsbot-net
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
@@ -65,4 +92,15 @@ services:
       retries: 5
 
 volumes:
+  gradle-cache:
+    driver: local
   build-artifacts:
+    driver: local
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+
+networks:
+  suggestionsbot-net:
+    driver: bridge

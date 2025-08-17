@@ -20,6 +20,24 @@ spring:
     redis:
       host: redis
       port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+management:
+  endpoints:
+    access:
+      default: none
+    web:
+      exposure:
+        include: health
+        exclude: env, beans, metrics, shutdown, loggers, heapdump
+
+  endpoint:
+    health:
+      access: read_only
+      show-details: always
+
+  server:
+    port: ${WORKER_PORT}
 
 logging:
   level:
