@@ -44,7 +44,6 @@
       </picture>
     </a>
   </div>
-  <br><br>
   <h1>ᴀᴄᴛɪᴠɪᴛʏ</h1>
   <a rel="noopener noreferrer" href="https://github.com/nykonhrytsyshyn/SuggestionsBot/pulse">
     <picture>
