@@ -7,8 +7,8 @@
     </picture>
   </a>
   <p>
-    Here you will find various things from the server <b>WhoMine</b><br> 
-    Most of them are pieces of shit so don't be surprised
+    Main repository containing the bot’s codebase<br>
+    Includes Docker configs, scripts, and other setup files
   </p>
   • • •<br><br>
   <div>
