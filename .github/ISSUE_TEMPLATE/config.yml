@@ -1,5 +1,11 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Issue with Pulse Bot
+    url: https://github.com/nykonhrytsyshyn/PulseBot/issues/new/choose
+    about: Please open issues relating to Pulse Bot in nykonhrytsyshyn/PulseBot
+  - name: Issue with site (nykon.me)
+    url: https://github.com/nykonhrytsyshyn/nykon.me/issues/new/choose
+    about: Please open issues relating to website in nykonhrytsyshyn/nykon.me
   - name: 🌐 Website
     url: https://nykon.me/
     about: Check out my website
