@@ -12,12 +12,12 @@ tasks {
             }
         }
     }
-    compileJava { enabled = false }
+    compileJava      { enabled = false }
     processResources { enabled = false }
-    classes { enabled = false }
-    assemble { enabled = false }
-    testClasses { enabled = false }
-    test { enabled = false }
-    check { enabled = false }
-    build { enabled = false }
+    classes          { enabled = false }
+    assemble         { enabled = false }
+    testClasses      { enabled = false }
+    test             { enabled = false }
+    check            { enabled = false }
+    build            { enabled = false }
 }

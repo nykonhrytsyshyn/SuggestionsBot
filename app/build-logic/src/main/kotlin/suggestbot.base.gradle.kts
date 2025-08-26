@@ -44,18 +44,18 @@ sourceSets {
 
 tasks {
     compileJava {
-        options.encoding = utf8
+        options.encoding = UTF_8
 
         options.release.set(javaVersionInt)
         options.compilerArgs.add(javaCompilerArgs)
     }
 
     javadoc {
-        options.encoding = utf8
+        options.encoding = UTF_8
         destinationDir = file("$rootDir/build/javadoc")
     }
 
     processResources {
-        filteringCharset = utf8
+        filteringCharset = UTF_8
     }
 }

@@ -60,7 +60,7 @@
     </picture>
   </a>
   &nbsp;&nbsp;
-  <a rel="license noopener noreferrer" href="https://github.com/MinersStudios/WhoMine#MIT-1-ov-file">
+  <a rel="license noopener noreferrer" href="https://github.com/nykonhrytsyshyn/SuggestionsBot#MIT-1-ov-file">
     <img alt="MIT License" src="https://upload.wikimedia.org/wikipedia/commons/0/0c/MIT_logo.svg" width="72px"/>
   </a>
   <h6>

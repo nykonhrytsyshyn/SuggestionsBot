@@ -13,7 +13,7 @@ includeLib("common")
 includeService("bot")
 includeService("worker")
 
-/* Functions for including libraries and services */
+/* Functions for including subprojects */
 //<editor-fold desc="Functions" defaultstate="collapsed">
 
 /**

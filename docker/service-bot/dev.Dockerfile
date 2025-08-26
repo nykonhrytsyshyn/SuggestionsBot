@@ -1,7 +1,7 @@
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine AS service-bot
 
 WORKDIR /app
 
 RUN apk add --no-cache curl
 
-ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=dev", "/app/SuggestService-bot-latest.jar"]
+ENTRYPOINT exec sh -c "java -jar -Dspring.profiles.active=dev /app/${BOT_JAR_OUTPUT}"

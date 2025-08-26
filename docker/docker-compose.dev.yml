@@ -1,37 +1,43 @@
 version: "3.9"
 name: suggestionsbot-dev
 
+# Common defaults for services
+# Reused via "<<: *defaults" to avoid duplication
+x-defaults: &defaults
+  env_file:
+    - ".env"
+    - ".env.build"
+  restart: always
+  networks:
+    - suggestionsbot-net
+
 services:
+  # Main bot service
   bot:
+    <<: *defaults
     container_name: service_bot
-    env_file: ".env"
     build:
       context: ..
       dockerfile: docker/service-bot/dev.Dockerfile
     depends_on:
-      worker:
-        condition: service_healthy
       redis:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     volumes:
       - build-artifacts:/app
     ports:
       - "${BOT_PORT}:${BOT_PORT}"
-    networks:
-      - suggestionsbot-net
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:${BOT_PORT}/actuator/health || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # Worker service for background processing
   worker:
+    <<: *defaults
     container_name: service_worker
-    env_file: ".env"
     build:
       context: ..
       dockerfile: docker/service-worker/dev.Dockerfile
@@ -42,30 +48,24 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
-    environment:
-      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     volumes:
       - build-artifacts:/app
     ports:
       - "${WORKER_PORT}:${WORKER_PORT}"
-    networks:
-      - suggestionsbot-net
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:${WORKER_PORT}/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
+  # RabbitMQ message broker
   rabbitmq:
+    <<: *defaults
     container_name: service_rabbitmq
     image: rabbitmq:4.1-management-alpine
-    env_file: ".env"
-    restart: always
     ports:
       - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
       - "${RABBITMQ_WEB_PORT}:${RABBITMQ_WEB_PORT}"
-    networks:
-      - suggestionsbot-net
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
@@ -74,41 +74,39 @@ services:
       timeout: 5s
       retries: 5
 
+  # PostgreSQL database
   postgres:
+    <<: *defaults
     container_name: db_postgres
     image: postgres:16-alpine
-    env_file: ".env"
-    restart: always
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
-    networks:
-      - suggestionsbot-net
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 3s
       retries: 5
 
+  # Redis cache and pub/sub
   redis:
+    <<: *defaults
     container_name: db_redis
     image: redis:7-alpine
-    env_file: ".env"
-    restart: always
     command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
     volumes:
       - redis-data:/data
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
-    networks:
-      - suggestionsbot-net
     healthcheck:
       test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 5
 
+# Volumes definition
+# Used for persistent storage outside of containers
 volumes:
   gradle-cache:
     driver: local
@@ -121,6 +119,7 @@ volumes:
   rabbitmq-data:
     driver: local
 
+# Dedicated network for all services
 networks:
   suggestionsbot-net:
     driver: bridge

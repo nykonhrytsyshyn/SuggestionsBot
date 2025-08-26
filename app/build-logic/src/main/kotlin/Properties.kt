@@ -5,7 +5,7 @@ import org.gradle.api.Project
 import org.gradle.jvm.toolchain.JavaLanguageVersion
 
 /** The UTF-8 charset name constant. */
-val utf8: String = Charsets.UTF_8.name()
+val UTF_8: String = Charsets.UTF_8.name()
 
 //<editor-fold desc="Project Properties" defaultstate="collapsed">
 
