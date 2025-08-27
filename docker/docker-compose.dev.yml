@@ -1,8 +1,45 @@
+# ⚠️ WARNING: DO NOT USE IN PRODUCTION
+#
+# This file defines the full development environment for SuggestionsBot.
+# It includes:
+#   - Core application services (bot, worker)
+#   - Supporting infrastructure (Postgres, Redis, RabbitMQ)
+#   - Monitoring & visualization tools (Prometheus, Grafana)
+#
+# Key points:
+#   - Services are network-isolated (bridge network).
+#   - Only Grafana is exposed by default; others are internal-only.
+#   - Additional override files can change behavior:
+#       - docker-compose.dev.expose.yml  → expose all ports for local testing
+#       - docker-compose.dev.builder.yml → add builder service for artifacts
+#
+# Usage with ./scripts/dev.sh:
+#
+# Commands:
+#   build           🔨 Build the application artifacts in the builder service only
+#   up              🚀 Start all containers without rebuilding artifacts
+#   all             🛠️ Build artifacts and start all containers in one command
+#   down            🛑 Stop and remove all running containers
+#   clean           🧹 Stop containers and remove containers, volumes, and images
+#
+# Optional flag:
+#   --expose-ports  🔓 Expose development ports externally (use with up/all)
+#
+# Examples:
+#   ./scripts/dev.sh up -d                  # Run containers in detached mode
+#   ./scripts/dev.sh all --force-recreate   # Rebuild and recreate all containers
+#   ./scripts/dev.sh down                   # Stop and remove all containers
+#   ./scripts/dev.sh clean                  # Completely clean everything
+#   ./scripts/dev.sh up --expose-ports      # Start containers with exposed ports
+#
+# Volumes are used for persistent data and build caching.
+# All services share the same network: "suggestionsbot-net".
+
 version: "3.9"
 name: suggestionsbot-dev
 
-# Common defaults for services
-# Reused via "<<: *defaults" to avoid duplication
+# Common defaults for services.
+# Reused via "<<: *defaults" to avoid duplication.
 x-defaults: &defaults
   env_file:
     - ".env"
@@ -12,7 +49,11 @@ x-defaults: &defaults
     - suggestionsbot-net
 
 services:
-  # Main bot service
+  # ========================= #
+  # Core application services #
+  # ========================= #
+
+  # Main bot service.
   bot:
     <<: *defaults
     container_name: service_bot
@@ -26,15 +67,15 @@ services:
         condition: service_healthy
     volumes:
       - build-artifacts:/app
-    ports:
-      - "${BOT_PORT}:${BOT_PORT}"
+    expose:
+      - "${BOT_PORT}"
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
+      test: [ "CMD-SHELL", "curl -f http://localhost:${BOT_PORT}/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # Worker service for background processing
+  # Worker service for background processing.
   worker:
     <<: *defaults
     container_name: service_worker
@@ -50,22 +91,71 @@ services:
         condition: service_healthy
     volumes:
       - build-artifacts:/app
-    ports:
-      - "${WORKER_PORT}:${WORKER_PORT}"
+    expose:
+      - "${WORKER_PORT}"
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:${WORKER_PORT}/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  # RabbitMQ message broker
+  # ========================== #
+  # Monitoring & observability #
+  # ========================== #
+
+  # Prometheus monitoring service.
+  prometheus:
+    <<: *defaults
+    container_name: service_prometheus
+    build:
+      context: ..
+      dockerfile: docker/service-prometheus/Dockerfile
+      args:
+        - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+        - BOT_PORT=${BOT_PORT}
+        - WORKER_PORT=${WORKER_PORT}
+        - RABBITMQ_WEB_PORT=${RABBITMQ_WEB_PORT}
+        - RABBITMQ_PORT=${RABBITMQ_PORT}
+        - POSTGRES_PORT=${POSTGRES_PORT}
+        - REDIS_PORT=${REDIS_PORT}
+    volumes:
+      - prometheus-data:/prometheus
+    expose:
+      - "${PROMETHEUS_PORT}"
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:${PROMETHEUS_PORT}/-/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Grafana visualization service.
+  # Exposes its port by default.
+  grafana:
+    <<: *defaults
+    container_name: service_grafana
+    image: grafana/grafana:latest
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:${GRAFANA_PORT}/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================= #
+  # Supporting infrastructure #
+  # ========================= #
+
+  # RabbitMQ message broker.
   rabbitmq:
     <<: *defaults
     container_name: service_rabbitmq
     image: rabbitmq:4.1-management-alpine
-    ports:
-      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
-      - "${RABBITMQ_WEB_PORT}:${RABBITMQ_WEB_PORT}"
+    expose:
+      - "${RABBITMQ_PORT}"
+      - "${RABBITMQ_WEB_PORT}"
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
@@ -74,22 +164,22 @@ services:
       timeout: 5s
       retries: 5
 
-  # PostgreSQL database
+  # PostgreSQL database.
   postgres:
     <<: *defaults
     container_name: db_postgres
     image: postgres:16-alpine
     volumes:
       - postgres-data:/var/lib/postgresql/data
-    ports:
-      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    expose:
+      - "${POSTGRES_PORT}"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 3s
       retries: 5
 
-  # Redis cache and pub/sub
+  # Redis cache and pub/sub.
   redis:
     <<: *defaults
     container_name: db_redis
@@ -97,20 +187,24 @@ services:
     command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
     volumes:
       - redis-data:/data
-    ports:
-      - "${REDIS_PORT}:${REDIS_PORT}"
+    expose:
+      - "${REDIS_PORT}"
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 5
 
-# Volumes definition
-# Used for persistent storage outside of containers
+# Volumes definition.
+# Used for persistent storage outside of containers.
 volumes:
   gradle-cache:
     driver: local
   build-artifacts:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
     driver: local
   postgres-data:
     driver: local
@@ -119,7 +213,7 @@ volumes:
   rabbitmq-data:
     driver: local
 
-# Dedicated network for all services
+# Dedicated isolated network for all services.
 networks:
   suggestionsbot-net:
     driver: bridge

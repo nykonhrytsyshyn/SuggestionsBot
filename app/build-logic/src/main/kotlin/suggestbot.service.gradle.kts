@@ -10,6 +10,16 @@ dependencies {
     testRuntimeOnly(libs.junit.platform.launcher)
 }
 
+springBoot {
+    buildInfo {
+        properties {
+            name = project.name
+            version = project.version.toString()
+            description = project.description
+        }
+    }
+}
+
 tasks {
     jar {
         enabled = false

@@ -5,6 +5,8 @@ plugins {
 dependencies {
     implementation(libs.telegram.client)
 
+    implementation(libs.micrometer.prometheus)
+
     implementation(libs.spring.actuator)
     implementation(libs.spring.amqp)
     implementation(libs.spring.data.jpa)

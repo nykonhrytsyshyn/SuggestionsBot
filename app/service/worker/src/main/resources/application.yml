@@ -1,13 +1,11 @@
 spring:
   application:
     name: SuggestionsWorker
-
   datasource:
     url: jdbc:postgresql://postgres:${POSTGRES_PORT}/${POSTGRES_DB}
     username: ${POSTGRES_USER}
     password: ${POSTGRES_PASSWORD}
     driver-class-name: org.postgresql.Driver
-
   jpa:
     hibernate:
       ddl-auto: update
@@ -15,13 +13,11 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
-
   rabbitmq:
     username: ${RABBITMQ_DEFAULT_USER}
     password: ${RABBITMQ_DEFAULT_PASS}
@@ -31,18 +27,20 @@ spring:
 
 management:
   endpoints:
-    access:
-      default: none
     web:
       exposure:
-        include: health
-        exclude: env, beans, metrics, shutdown, loggers, heapdump
-
+        include: health, info, metrics, prometheus
+        exclude: env, beans, shutdown, loggers, heapdump
   endpoint:
     health:
       access: read_only
       show-details: always
-
+  info:
+    env:
+      enabled: true
+  metrics:
+    enable:
+      all: true
   server:
     port: ${WORKER_PORT}
 

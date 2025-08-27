@@ -26,6 +26,7 @@ google-jsr305                   = { group = "com.google.code.findbugs", name = "
 jetbrains-annotations           = { group = "org.jetbrains",            name = "annotations",                                 version.ref = "jetbrains-annotations" }
 junit-jupiter                   = { group = "org.junit.jupiter",        name = "junit-jupiter",                               version.ref = "junit-jupiter" }
 junit-platform-launcher         = { group = "org.junit.platform",       name = "junit-platform-launcher" }
+micrometer-prometheus           = { group = "io.micrometer",            name = "micrometer-registry-prometheus" }
 postgresql                      = { group = "org.postgresql",           name = "postgresql" }
 spring-actuator                 = { group = "org.springframework.boot", name = "spring-boot-starter-actuator" }
 spring-amqp                     = { group = "org.springframework.boot", name = "spring-boot-starter-amqp" }

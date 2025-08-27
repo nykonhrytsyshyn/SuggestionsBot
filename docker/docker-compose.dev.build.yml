@@ -1,5 +1,26 @@
+# ⚠️ WARNING: DO NOT USE IN PRODUCTION
+#
 # This file overrides the "docker-compose.dev.yml" file.
-# It is used to build the application artifacts in a separate builder service.
+# It introduces a dedicated "builder" service that compiles application
+# artifacts (e.g. JARs, compiled classes) in an isolated container.
+#
+# Motivation:
+#   - Keeps the build environment separate from runtime containers.
+#   - Ensures consistent, reproducible builds inside Docker (no host dependencies).
+#   - Shares build results with other services through a named volume.
+#
+# Usage examples:
+#   - Rebuild artifacts without starting all services:
+#       ./scripts/dev.sh build
+#
+#   - Run full environment, including the builder:
+#       ./scripts/dev.sh all
+#
+# After the builder finishes successfully, dependent services (bot, worker)
+# will start automatically, using artifacts placed in "build-artifacts:/output".
+#
+# This setup is intended for local development and CI pipelines,
+# not for production deployments.
 
 # Defaults for services that depend on the builder service
 x-depends-on-builder: &depends-on-builder
@@ -22,12 +43,12 @@ services:
       - build-artifacts:/output
       - gradle-cache:/home/gradle/.gradle
 
-  # Expected that the "bot" service already exists in the overridden file.
-  # It will wait for the "builder" service to complete the build successfully.
+  # The "bot" service is expected to be defined in the base dev file.
+  # Here, it is configured to wait until the builder has finished successfully.
   bot:
     <<: *depends-on-builder
 
-  # Expected that the "worker" service already exists in the overridden file.
-  # It will wait for the "builder" service to complete the build successfully.
+  # The "worker" service is expected to be defined in the base dev file.
+  # It will also wait until the builder has finished successfully.
   worker:
     <<: *depends-on-builder

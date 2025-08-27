@@ -1,0 +1,55 @@
+# ⚠️ WARNING: DO NOT USE IN PRODUCTION
+#
+# This file overrides the "docker-compose.dev.yml" file.
+# It is used to open the necessary ports for external access during development
+# and testing.
+#
+# Exposing ports outside Docker is convenient for debugging, connecting local
+# tools (e.g. Redis CLI, RabbitMQ UI, Postman, etc.), and manual inspection.
+# However, this also reduces isolation and security, so it must never be used
+# in production environments.
+#
+# Usage examples:
+#   - Run with exposed ports for debugging and manual access:
+#       ./scripts/dev.sh up --expose-ports
+#
+# This allows you to switch between a secure internal setup and a more open
+# developer-friendly setup without editing the base file.
+
+services:
+  # The bot service is normally accessible only inside Docker network.
+  # With this override, it exposes its port to the host machine.
+  bot:
+    ports:
+      - "${BOT_PORT}:${BOT_PORT}"
+
+  # The worker service is also exposed for debugging purposes.
+  worker:
+    ports:
+      - "${WORKER_PORT}:${WORKER_PORT}"
+
+  # Prometheus metrics endpoint is opened on the host.
+  prometheus:
+    ports:
+      - "${PROMETHEUS_PORT}:${PROMETHEUS_PORT}"
+
+  # Grafana already exposes its port in the base file.
+  # grafana:
+  #   ports:
+  #     - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+
+  # RabbitMQ (broker + management UI) is exposed for inspection and testing.
+  rabbitmq:
+    ports:
+      - "${RABBITMQ_PORT}:${RABBITMQ_PORT}"
+      - "${RABBITMQ_WEB_PORT}:${RABBITMQ_WEB_PORT}"
+
+  # PostgreSQL database port is opened for local tools (e.g. DBeaver, psql).
+  postgres:
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+
+  # Redis is exposed for local inspection (CLI tools, debugging).
+  redis:
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"

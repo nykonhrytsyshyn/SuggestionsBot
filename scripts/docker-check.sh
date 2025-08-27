@@ -63,5 +63,20 @@ check_docker() {
     fi
 }
 
+check_docker_compose() {
+    if command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker-compose"
+    elif command -v docker &> /dev/null && docker compose version &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker compose"
+    else
+        echo "⛔ ❌ Docker Compose is not installed or not in your PATH."
+        echo "👉 Please install it from $DOCKER_INSTALL_URL"
+        exit 1
+    fi
+    export DOCKER_COMPOSE_CMD
+    echo "✅ Docker Compose found: $DOCKER_COMPOSE_CMD"
+}
+
 source ./load-env.sh || exit 1
 check_docker
+check_docker_compose

@@ -1,13 +1,11 @@
 spring:
   application:
     name: SuggestionsBot
-
   data:
     redis:
       host: ${REDIS_HOST}
       port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
-
   rabbitmq:
     username: ${RABBITMQ_DEFAULT_USER}
     password: ${RABBITMQ_DEFAULT_PASS}
@@ -17,18 +15,26 @@ spring:
 
 management:
   endpoints:
-    access:
-      default: none
     web:
       exposure:
-        include: health
-        exclude: env, beans, metrics, shutdown, loggers, heapdump
-
+        include: info, health, metrics, prometheus
+        exclude: env, beans, shutdown, loggers, heapdump
   endpoint:
+    info:
+      access: read_only
     health:
       access: read_only
       show-details: always
-
+    metrics:
+      access: read_only
+    prometheus:
+      access: read_only
+  info:
+    env:
+      enabled: true
+  metrics:
+    enable:
+      all: true
   server:
     port: ${BOT_PORT}
 
