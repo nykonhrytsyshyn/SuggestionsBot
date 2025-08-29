@@ -1,0 +1,42 @@
+# ⚠️ WARNING: PRODUCTION ENVIRONMENT
+#
+# This file defines the full production environment for SuggestionsBot.
+# (Use by overriding the base "docker-compose.yml" file.)
+# It includes:
+#   - Core application services (bot, worker)
+#   - Monitoring & alerting tools (Prometheus, Grafana)
+#
+# Key points:
+#   - Services run in isolated networks and use persistent volumes.
+#   - Only necessary ports are exposed externally; everything else is internal.
+#   - Production configurations are optimized for stability, not convenience.
+#
+# Usage with ./scripts/prod.sh:
+#
+# Commands:
+#   build      🔨 Build production Docker images
+#   push       📤 Push images to Docker registry
+#   release    🚀 Build and push images in one step
+#   up         🚀 Start containers from prebuilt images
+#   swarm      🌐 Deploy services using Docker Swarm
+#   swarm-down 🛑 Remove services from Docker Swarm
+#   down       🛑 Stop and remove containers
+#   clean      🧹 Remove containers, volumes, and images
+#
+# Volumes are used for persistent data and build caching.
+# All services share the same network: "suggestionsbot-net".
+
+name: suggestionsbot-prod
+
+services:
+  # ========================= #
+  # Core application services #
+  # ========================= #
+
+  # Main bot service.
+  bot:
+    image: nykonhrytsyshyn/suggestions-bot:latest
+
+  # Worker service for background processing.
+  worker:
+    image: nykonhrytsyshyn/suggestions-worker:latest

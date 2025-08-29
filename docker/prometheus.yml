@@ -6,12 +6,12 @@ global:
 scrape_configs:
   - job_name: 'prometheus'
     static_configs:
-      - targets: ['localhost:${PROMETHEUS_PORT}']
+      - targets: ['localhost:9090']
 
   - job_name: 'bot'
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['bot:${BOT_PORT}']
+      - targets: ['bot:9000']
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance
@@ -20,7 +20,7 @@ scrape_configs:
   - job_name: 'worker'
     metrics_path: /actuator/prometheus
     static_configs:
-      - targets: ['worker:${WORKER_PORT}']
+      - targets: ['worker:9001']
     relabel_configs:
       - source_labels: [__address__]
         target_label: instance

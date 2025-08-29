@@ -1,6 +1,7 @@
 # ⚠️ WARNING: DO NOT USE IN PRODUCTION
 #
 # This file defines the full development environment for SuggestionsBot.
+# (Use by overriding the base "docker-compose.yml" file.)
 # It includes:
 #   - Core application services (bot, worker)
 #   - Supporting infrastructure (Postgres, Redis, RabbitMQ)
@@ -22,20 +23,12 @@
 #   down            🛑 Stop and remove all running containers
 #   clean           🧹 Stop containers and remove containers, volumes, and images
 #
-# Optional flag:
+# Optional flags:
 #   --expose-ports  🔓 Expose development ports externally (use with up/all)
-#
-# Examples:
-#   ./scripts/dev.sh up -d                  # Run containers in detached mode
-#   ./scripts/dev.sh all --force-recreate   # Rebuild and recreate all containers
-#   ./scripts/dev.sh down                   # Stop and remove all containers
-#   ./scripts/dev.sh clean                  # Completely clean everything
-#   ./scripts/dev.sh up --expose-ports      # Start containers with exposed ports
 #
 # Volumes are used for persistent data and build caching.
 # All services share the same network: "suggestionsbot-net".
 
-version: "3.9"
 name: suggestionsbot-dev
 
 # Common defaults for services.
@@ -56,7 +49,6 @@ services:
   # Main bot service.
   bot:
     <<: *defaults
-    container_name: service_bot
     build:
       context: ..
       dockerfile: docker/service-bot/dev.Dockerfile
@@ -67,18 +59,10 @@ services:
         condition: service_healthy
     volumes:
       - build-artifacts:/app
-    expose:
-      - "${BOT_PORT}"
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:${BOT_PORT}/actuator/health || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # Worker service for background processing.
   worker:
     <<: *defaults
-    container_name: service_worker
     build:
       context: ..
       dockerfile: docker/service-worker/dev.Dockerfile
@@ -91,58 +75,6 @@ services:
         condition: service_healthy
     volumes:
       - build-artifacts:/app
-    expose:
-      - "${WORKER_PORT}"
-    healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:${WORKER_PORT}/actuator/health || exit 1" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # ========================== #
-  # Monitoring & observability #
-  # ========================== #
-
-  # Prometheus monitoring service.
-  prometheus:
-    <<: *defaults
-    container_name: service_prometheus
-    build:
-      context: ..
-      dockerfile: docker/service-prometheus/Dockerfile
-      args:
-        - PROMETHEUS_PORT=${PROMETHEUS_PORT}
-        - BOT_PORT=${BOT_PORT}
-        - WORKER_PORT=${WORKER_PORT}
-        - RABBITMQ_WEB_PORT=${RABBITMQ_WEB_PORT}
-        - RABBITMQ_PORT=${RABBITMQ_PORT}
-        - POSTGRES_PORT=${POSTGRES_PORT}
-        - REDIS_PORT=${REDIS_PORT}
-    volumes:
-      - prometheus-data:/prometheus
-    expose:
-      - "${PROMETHEUS_PORT}"
-    healthcheck:
-      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:${PROMETHEUS_PORT}/-/ready" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
-  # Grafana visualization service.
-  # Exposes its port by default.
-  grafana:
-    <<: *defaults
-    container_name: service_grafana
-    image: grafana/grafana:latest
-    volumes:
-      - grafana-data:/var/lib/grafana
-    ports:
-      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
-    healthcheck:
-      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:${GRAFANA_PORT}/api/health" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   # ========================= #
   # Supporting infrastructure #
@@ -202,18 +134,9 @@ volumes:
     driver: local
   build-artifacts:
     driver: local
-  prometheus-data:
-    driver: local
-  grafana-data:
-    driver: local
   postgres-data:
     driver: local
   redis-data:
     driver: local
   rabbitmq-data:
     driver: local
-
-# Dedicated isolated network for all services.
-networks:
-  suggestionsbot-net:
-    driver: bridge

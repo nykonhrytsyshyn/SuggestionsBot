@@ -17,12 +17,14 @@
 #       ./scripts/dev.sh all
 #
 # After the builder finishes successfully, dependent services (bot, worker)
-# will start automatically, using artifacts placed in "build-artifacts:/output".
+# will start automatically, if command is "all", using artifacts placed in
+# "build-artifacts:/output".
 #
 # This setup is intended for local development and CI pipelines,
 # not for production deployments.
 
 # Defaults for services that depend on the builder service
+# Reused via "<<: *depends-on-builder" to avoid duplication.
 x-depends-on-builder: &depends-on-builder
   depends_on:
     builder:
@@ -38,7 +40,7 @@ services:
       - ".env.build"
     build:
       context: ..
-      dockerfile: docker/builder/dev.Dockerfile
+      dockerfile: docker/builder/Dockerfile
     volumes:
       - build-artifacts:/output
       - gradle-cache:/home/gradle/.gradle

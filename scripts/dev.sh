@@ -14,6 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 # Docker Compose file paths
+COMPOSE="../docker/docker-compose.yml"
 COMPOSE_DEV="../docker/docker-compose.dev.yml"
 COMPOSE_EXPOSE="../docker/docker-compose.dev.expose.yml"
 COMPOSE_BUILD="../docker/docker-compose.dev.build.yml"
@@ -28,6 +29,10 @@ for i in "${!DC_FLAGS[@]}"; do
     fi
 done
 
+# Check for commands that require build
+USE_BUILD=true
+[[ "$COMMAND" == "up" ]] && USE_BUILD=false
+
 usage() {
     echo -e "${GREEN}Usage:${NC} $0 {build|up|all|down|clean} [docker-compose flags] [--expose-ports]"
     echo
@@ -37,6 +42,9 @@ usage() {
     echo -e "  all        🛠️ Build and start the containers"
     echo -e "  down       🛑 Stop and remove the containers"
     echo -e "  clean      🧹 Stop containers and remove containers, volumes, and images"
+    echo
+    echo -e "${YELLOW}Options:${NC}"
+    echo -e "  --expose-ports   🔓 Expose development ports externally (use with up/all)"
     echo
     echo -e "${YELLOW}Examples:${NC}"
     echo "  $0 up -d                     Run containers in detached mode"
@@ -73,13 +81,9 @@ case "$OS_TYPE" in
 esac
 
 # Select compose files depending on the command
-if [[ "$COMMAND" == "up" ]]; then
-    COMPOSE_FILES=( "$COMPOSE_DEV" )
-    $USE_EXPOSE && COMPOSE_FILES+=( "$COMPOSE_EXPOSE" )
-else
-    COMPOSE_FILES=( "$COMPOSE_DEV" "$COMPOSE_BUILD" )
-    $USE_EXPOSE && COMPOSE_FILES+=( "$COMPOSE_EXPOSE" )
-fi
+COMPOSE_FILES=( "$COMPOSE" "$COMPOSE_DEV" )
+$USE_BUILD && COMPOSE_FILES+=( "$COMPOSE_BUILD" )
+$USE_EXPOSE && COMPOSE_FILES+=( "$COMPOSE_EXPOSE" )
 
 # Convert paths for Cygwin/MSYS/Darwin
 if $CYGWIN || $MSYS || $DARWIN; then
@@ -114,10 +118,14 @@ case $COMMAND in
         ;;
     down)
         echo "🛑 Stopping and removing containers..."
-        $DOCKER_COMPOSE_CMD "${COMPOSE_ARGS[@]}" down "${DC_FLAGS[@]}"
+        $DOCKER_COMPOSE_CMD "${COMPOSE_ARGS[@]}" down "${DC_FLAGS[@]}" --remove-orphans
         ;;
     clean)
         echo "🧹 Cleaning everything: containers, volumes, and images..."
-        $DOCKER_COMPOSE_CMD "${COMPOSE_ARGS[@]}" down -v --rmi all --remove-orphans
+        $DOCKER_COMPOSE_CMD "${COMPOSE_ARGS[@]}" down -v --rmi all
+        ;;
+    *)
+        echo -e "⛔ ${RED}ERROR:${NC} Unknown command '$COMMAND'"
+        usage
         ;;
 esac

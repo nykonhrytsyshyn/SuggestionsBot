@@ -1,0 +1,130 @@
+version: "3.9"
+
+# Common defaults for services.
+# Reused via "<<: *defaults" to avoid duplication.
+x-defaults: &defaults
+  # TODO: Consider using secrets for sensitive data.
+  # See: https://docs.docker.com/engine/swarm/secrets/
+  env_file:
+    - ".env"
+  networks:
+    - suggestionsbot-net
+
+services:
+  # ========================= #
+  # Core application services #
+  # ========================= #
+
+  # Main bot service.
+  bot:
+    <<: *defaults
+    image: nykonhrytsyshyn/suggestions-bot:latest
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9000/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Worker service for background processing.
+  worker:
+    <<: *defaults
+    image: nykonhrytsyshyn/suggestions-worker:latest
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:9001/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # ========================== #
+  # Monitoring & observability #
+  # ========================== #
+
+  # Prometheus monitoring service.
+  prometheus:
+    <<: *defaults
+    image: prom/prometheus:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+    configs:
+      - source: prometheus-config
+        target: /etc/prometheus/prometheus.yml
+    volumes:
+      - prometheus-data:/prometheus
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:9090/-/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Grafana visualization service.
+  grafana:
+    <<: *defaults
+    image: grafana/grafana:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.role == manager
+    ports:
+      - target: 3000
+        published: 3003
+        protocol: tcp
+        mode: ingress
+    volumes:
+      - grafana-data:/var/lib/grafana
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:3000/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+# Volumes definition.
+# Used for persistent storage outside of containers.
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# Dedicated isolated network for all services.
+networks:
+  suggestionsbot-net:
+    driver: overlay
+
+# Configuration files.
+configs:
+  prometheus-config:
+    file: ./prometheus.yml

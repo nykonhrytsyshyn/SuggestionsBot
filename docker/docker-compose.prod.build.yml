@@ -1,0 +1,27 @@
+# ⚠️ WARNING: ONLY FOR BUILDING IMAGES, NOT FOR DEPLOY
+#
+# This file overrides the "docker-compose.prod.yml" file.
+# It is used to build the Docker images for production deployment.
+#
+# Usage examples:
+#   - To build the production images, run:
+#       ./scripts/prod.sh build
+#   - To push the built images to a registry, run:
+#       ./scripts/prod.sh push
+
+services:
+  # ========================= #
+  # Core application services #
+  # ========================= #
+
+  # Main bot service.
+  bot:
+    build:
+      context: ..
+      dockerfile: docker/service-bot/prod.Dockerfile
+
+  # Worker service for background processing.
+  worker:
+    build:
+      context: ..
+      dockerfile: docker/service-worker/prod.Dockerfile

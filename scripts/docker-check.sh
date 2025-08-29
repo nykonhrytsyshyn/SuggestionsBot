@@ -77,6 +77,19 @@ check_docker_compose() {
     echo "✅ Docker Compose found: $DOCKER_COMPOSE_CMD"
 }
 
+init_docker_stack() {
+    if ! docker info | grep -q 'Swarm: active'; then
+        echo "🔧 Initializing Docker Swarm..."
+        docker swarm init >/dev/null 2>&1 || {
+            echo "❌ Failed to initialize Docker Swarm."
+            exit 1
+        }
+        echo "✅ Docker Swarm initialized."
+    else
+        echo "✅ Docker Swarm is already active."
+    fi
+}
+
 source ./load-env.sh || exit 1
 check_docker
 check_docker_compose

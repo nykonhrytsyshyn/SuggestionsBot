@@ -1,0 +1,111 @@
+# ⚠️ BASE COMPOSE FILE – NOT FOR DIRECT USE
+#
+# This file defines common defaults for all SuggestionsBot services.
+# It is intended to be extended or overridden by environment-specific
+# files such as:
+#   - docker-compose.dev.yml
+#   - docker-compose.prod.yml
+#
+# Usage:                      (See the respective files for usage instructions.)
+#   This file should NEVER be run directly:
+#     docker-compose -f docker-compose.yml up
+#   Instead, always use an environment-specific override:
+#     docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+#     docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+version: "3.9"
+
+# Common defaults for services.
+# Reused via "<<: *defaults" to avoid duplication.
+x-defaults: &defaults
+  env_file:
+    - ".env"
+  restart: always
+  networks:
+    - suggestionsbot-net
+
+services:
+  # ========================= #
+  # Core application services #
+  # ========================= #
+
+  # Main bot service.
+  bot:
+    <<: *defaults
+    container_name: service_bot
+    expose:
+      - "${BOT_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${BOT_PORT}/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Worker service for background processing.
+  worker:
+    <<: *defaults
+    container_name: service_worker
+    expose:
+      - "${WORKER_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:${WORKER_PORT}/actuator/health || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ========================== #
+  # Monitoring & observability #
+  # ========================== #
+
+  # Prometheus monitoring service.
+  prometheus:
+    <<: *defaults
+    container_name: service_prometheus
+    build:
+      context: ..
+      dockerfile: docker/service-prometheus/Dockerfile
+      args:
+        - PROMETHEUS_PORT=${PROMETHEUS_PORT}
+        - BOT_PORT=${BOT_PORT}
+        - WORKER_PORT=${WORKER_PORT}
+        - RABBITMQ_WEB_PORT=${RABBITMQ_WEB_PORT}
+        - RABBITMQ_PORT=${RABBITMQ_PORT}
+        - POSTGRES_PORT=${POSTGRES_PORT}
+        - REDIS_PORT=${REDIS_PORT}
+    volumes:
+      - prometheus-data:/prometheus
+    expose:
+      - "${PROMETHEUS_PORT}"
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:${PROMETHEUS_PORT}/-/ready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Grafana visualization service.
+  grafana:
+    <<: *defaults
+    container_name: service_grafana
+    image: grafana/grafana:latest
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT}:${GRAFANA_PORT}"
+    healthcheck:
+      test: [ "CMD", "wget", "-q", "-O-", "http://localhost:${GRAFANA_PORT}/api/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+# Volumes definition.
+# Used for persistent storage outside of containers.
+volumes:
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+
+# Dedicated isolated network for all services.
+networks:
+  suggestionsbot-net:
+    driver: bridge
