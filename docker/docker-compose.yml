@@ -61,17 +61,10 @@ services:
   prometheus:
     <<: *defaults
     container_name: service_prometheus
-    build:
-      context: ..
-      dockerfile: docker/service-prometheus/Dockerfile
-      args:
-        - PROMETHEUS_PORT=${PROMETHEUS_PORT}
-        - BOT_PORT=${BOT_PORT}
-        - WORKER_PORT=${WORKER_PORT}
-        - RABBITMQ_WEB_PORT=${RABBITMQ_WEB_PORT}
-        - RABBITMQ_PORT=${RABBITMQ_PORT}
-        - POSTGRES_PORT=${POSTGRES_PORT}
-        - REDIS_PORT=${REDIS_PORT}
+    image: prom/prometheus:latest
+    configs:
+      - source: prometheus-config
+        target: /etc/prometheus/prometheus.yml
     volumes:
       - prometheus-data:/prometheus
     expose:
@@ -109,3 +102,8 @@ volumes:
 networks:
   suggestionsbot-net:
     driver: bridge
+
+# Configuration files.
+configs:
+  prometheus-config:
+    file: ./prometheus.yml
