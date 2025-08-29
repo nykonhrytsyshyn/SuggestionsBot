@@ -1,13 +1,12 @@
 plugins {
     id("suggestbot.base")
-    id("org.springframework.boot")
-    id("io.spring.dependency-management")
+    alias(libs.plugins.spring.boot)
+    alias(libs.plugins.spring.dependency.management)
 }
 
 dependencies {
     annotationProcessor(libs.spring.configuration.processor)
     testImplementation(libs.spring.test)
-    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 springBoot {

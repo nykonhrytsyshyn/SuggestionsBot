@@ -1,3 +1,3 @@
 plugins {
-    id("suggestbot.library")
+    alias(libs.plugins.suggestbot.library)
 }

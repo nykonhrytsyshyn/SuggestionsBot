@@ -1,5 +1,5 @@
 plugins {
-    id("suggestbot.service")
+    alias(libs.plugins.suggestbot.service)
 }
 
 dependencies {

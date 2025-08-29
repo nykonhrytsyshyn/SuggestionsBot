@@ -1,11 +1,6 @@
-import gradle.kotlin.dsl.accessors._a252323f2477ad123f0aa5aba7a9238a.test
-import gradle.kotlin.dsl.accessors._a252323f2477ad123f0aa5aba7a9238a.testImplementation
-import gradle.kotlin.dsl.accessors._a252323f2477ad123f0aa5aba7a9238a.testRuntimeOnly
-import org.gradle.kotlin.dsl.invoke
-
 plugins {
     id("suggestbot.base")
-    id("com.gradleup.shadow")
+    alias(libs.plugins.shadow)
 }
 
 dependencies {
