@@ -41,3 +41,7 @@ management:
 logging:
   level:
     root: info
+
+bot:
+  username: ${TELEGRAM_BOT_USERNAME}
+  token: ${TELEGRAM_BOT_TOKEN}

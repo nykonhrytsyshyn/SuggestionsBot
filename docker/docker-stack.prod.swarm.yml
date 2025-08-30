@@ -20,16 +20,12 @@ services:
     <<: *defaults
     image: nykonhrytsyshyn/suggestions-bot:latest
     deploy:
-      replicas: 2
+      replicas: 1
       restart_policy:
         condition: on-failure
-      resources:
-        limits:
-          cpus: '0.50'
-          memory: 256M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
+      placement:
+        constraints:
+          - node.role == manager
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:9000/actuator/health || exit 1" ]
       interval: 10s
@@ -47,11 +43,11 @@ services:
         condition: on-failure
       resources:
         limits:
-          cpus: '0.50'
-          memory: 256M
+          cpus: "1.0"
+          memory: 512M
         reservations:
-          cpus: '0.25'
-          memory: 128M
+          cpus: "0.5"
+          memory: 256M
     healthcheck:
       test: [ "CMD-SHELL", "curl -f http://localhost:9001/actuator/health || exit 1" ]
       interval: 10s
