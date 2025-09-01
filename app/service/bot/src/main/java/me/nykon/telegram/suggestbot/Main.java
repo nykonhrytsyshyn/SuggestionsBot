@@ -1,12 +1,13 @@
 package me.nykon.telegram.suggestbot;
 
-import me.nykon.telegram.suggestbot.props.BotProperties;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
-@EnableConfigurationProperties(BotProperties.class)
+@EnableConfigurationProperties
+@ConfigurationPropertiesScan("me.nykon.telegram.suggestbot.props")
 @SpringBootApplication
 public class Main {
 

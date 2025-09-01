@@ -52,12 +52,14 @@ public final class SuggestionsBot implements SpringLongPollingBot, LongPollingSi
         if (
                 msg != null
                 && msg.hasText()
+                && msg.isUserMessage()
         ) {
             try {
                 this.client.execute(
                         SendMessage
                         .builder()
                         .chatId(msg.getChatId())
+                        .replyToMessageId(msg.getMessageId())
                         .text(msg.getText())
                         .build()
                 );

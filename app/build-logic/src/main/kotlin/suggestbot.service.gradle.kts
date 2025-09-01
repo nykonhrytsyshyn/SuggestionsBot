@@ -5,8 +5,17 @@ plugins {
 }
 
 dependencies {
+    compileOnlyApi(SubProjects.SpringLib.asProject(rootProject))
+
     annotationProcessor(libs.spring.configuration.processor)
+
     testImplementation(libs.spring.test)
+}
+
+sourceSets {
+    main {
+        java.srcDir(SubProjects.SpringLib.asProject(rootProject).sourceSets.main.get().java.srcDirs)
+    }
 }
 
 springBoot {

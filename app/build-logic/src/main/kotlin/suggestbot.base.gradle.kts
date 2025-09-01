@@ -26,8 +26,8 @@ repositories {
 }
 
 dependencies {
-    if (project.name != SubProjects.Common.projectName) {
-        compileOnlyApi(SubProjects.Common.asProject(rootProject))
+    if (project.name != SubProjects.CommonLib.projectName) {
+        compileOnlyApi(SubProjects.CommonLib.asProject(rootProject))
     }
 
     implementation(libs.fastutil)
@@ -38,7 +38,7 @@ dependencies {
 
 sourceSets {
     main {
-        java.srcDir(SubProjects.Common.asProject(rootProject).sourceSets.main.get().java.srcDirs)
+        java.srcDir(SubProjects.CommonLib.asProject(rootProject).sourceSets.main.get().java.srcDirs)
     }
 }
 

@@ -1,24 +1,24 @@
 package me.nykon.telegram.suggestbot.props;
 
-import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.ConstructorBinding;
+import org.springframework.util.Assert;
+import org.springframework.util.StringUtils;
 
-@ConfigurationProperties(prefix = "bot")
+@ConfigurationProperties("bot")
 public final class BotProperties {
 
     private final String username;
-    private final String token;
+    private final transient String token;
 
     @ConstructorBinding
     public BotProperties(
             final String username,
             final String token
     ) {
-        Preconditions.checkArgument(!StringUtils.isBlank(username), "Bot username cannot be null or blank");
-        Preconditions.checkArgument(!StringUtils.isBlank(token), "Bot token cannot be null or blank");
+        Assert.isTrue(StringUtils.hasText(username), "Bot username cannot be null or blank");
+        Assert.isTrue(StringUtils.hasText(token),    "Bot token cannot be null or blank");
 
         this.username = username;
         this.token = token;

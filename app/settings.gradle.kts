@@ -9,6 +9,7 @@ rootProject.name = "SuggestionsBot"
 /* Subprojects */
 
 includeLib("common")
+includeLib("spring")
 
 includeService("bot")
 includeService("worker")

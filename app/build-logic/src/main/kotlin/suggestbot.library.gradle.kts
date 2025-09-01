@@ -1,6 +1,5 @@
 plugins {
     id("suggestbot.base")
-    alias(libs.plugins.shadow)
 }
 
 dependencies {
@@ -13,16 +12,7 @@ tasks {
         destinationDirectory.set(file("$rootDir/build/lib"))
     }
 
-    shadowJar {
-        archiveFileName.set("${project.name}-${project.version}.jar")
-        destinationDirectory.set(file("$rootDir/build/lib"))
-    }
-
     test {
         useJUnitPlatform()
-    }
-
-    build {
-        dependsOn(shadowJar)
     }
 }

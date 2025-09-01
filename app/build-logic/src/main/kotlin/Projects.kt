@@ -121,11 +121,13 @@ sealed class SubProjects(
     //<editor-fold desc="Subprojects" defaultstate="collapsed">
 
     /** Common library module with shared components. */
-    object Common : SubProjects(ProjectType.LIB,     "common")
+    object CommonLib : SubProjects(ProjectType.LIB,     "common")
+    /** Spring library module with Spring Framework utilities. */
+    object SpringLib : SubProjects(ProjectType.LIB, "spring")
     /** Main bot service module. */
-    object Bot    : SubProjects(ProjectType.SERVICE, "bot")
+    object Bot       : SubProjects(ProjectType.SERVICE, "bot")
     /** Worker service module for background tasks. */
-    object Worker : SubProjects(ProjectType.SERVICE, "worker")
+    object Worker    : SubProjects(ProjectType.SERVICE, "worker")
 
     //</editor-fold>
 
@@ -139,7 +141,7 @@ sealed class SubProjects(
         fun fromName(name: String): SubProject? =
             listOf(
                 /* Libraries */
-                Common,
+                CommonLib, SpringLib,
                 /* Services */
                 Bot, Worker
             ).find { it.projectName == name }

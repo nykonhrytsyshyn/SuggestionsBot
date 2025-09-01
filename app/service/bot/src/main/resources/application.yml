@@ -32,6 +32,13 @@ management:
   info:
     env:
       enabled: true
+  health:
+    # Implemented in a custom silent way, see RabbitHealthIndicator
+    rabbit:
+      enabled: false
+    # Implemented in a custom silent way, see RedisHealthIndicator
+    redis:
+      enabled: false
   metrics:
     enable:
       all: true
